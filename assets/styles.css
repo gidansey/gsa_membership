@@ -1,0 +1,795 @@
+/* ======================
+   RESET & BASE STYLES
+   ====================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f4f6f9;
+    color: #333;
+    line-height: 1.6;
+}
+
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2980b9;
+    --accent-color: #e74c3c;
+    --light-gray: #f5f5f5;
+    --medium-gray: #e0e0e0;
+    --dark-gray: #333;
+    --white: #ffffff;
+    --success-color: #2ecc71;
+    --warning-color: #f39c12;
+    --danger-color: #e74c3c;
+    --info-color: #3498db;
+    --sidebar-bg: #2f3640;
+    --sidebar-hover: #414b57;
+    --card-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    --transition: all 0.3s ease;
+}
+/* ======================
+   LAYOUT STRUCTURE
+   ====================== */
+.dashboard {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ======================
+   SIDEBAR NAVIGATION
+   ====================== */
+.sidebar {
+    width: 250px;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 0;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    height: 100vh;
+    z-index: 1000;
+}
+
+.sidebar.active {
+    margin-left: -250px;
+}
+
+.sidebar .logo {
+    width: 60px;
+    height: 60px;
+    background: url('gsa_logo.svg') no-repeat center;
+    background-size: contain;
+    border-radius: 50%;
+    margin-bottom: 40px;
+}
+
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    flex-grow: 1; /* push logout to bottom */
+}
+
+.sidebar nav a {
+    display: block;
+    padding: 12px 20px;
+    color: #ecf0f1;
+    text-decoration: none;
+    transition: var(--transition);
+    border-left: 4px solid transparent;
+}
+
+.sidebar nav a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left: 4px solid var(--primary-color);
+    color: #fff;
+}
+
+.sidebar nav a.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left: 4px solid var(--primary-color);
+    font-weight: bold;
+}
+
+/* ======================
+   HEADER & LOGO
+   ====================== */
+.main {
+    flex: 1;
+    padding: 30px;
+    margin-left: 250px;
+    background-color: var(--white);
+    transition: var(--transition);
+}
+
+/*header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--medium-gray);
+}*/
+
+header h1 {
+    margin: 0;
+    color: var(--dark-gray);
+    font-size: 28px;
+}
+
+header p {
+    color: #777;
+    margin-bottom: 30px;
+}
+
+.logo {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logo img {
+    width: 50px;
+    height: 50px;
+}
+
+/* ======================
+   CARD COMPONENTS
+   ====================== */
+.cards {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.card {
+    flex: 1;
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: var(--card-shadow);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.card p {
+    color: #777;
+    font-size: 14px;
+}
+
+.card h2 {
+    font-size: 28px;
+    margin-top: 10px;
+    color: var(--dark-gray);
+}
+
+/* ======================
+   TABLES & GRID LAYOUTS
+   ====================== */
+.grid {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.table-card {
+    flex: 1;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 30px;
+}
+
+.table-card h3 {
+    margin-bottom: 20px;
+    color: var(--dark-gray);
+    font-size: 18px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.table-card table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-card table th,
+.table-card table td {
+    padding: 10px;
+    text-align: left;
+}
+
+.table-card table tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--medium-gray);
+}
+
+th {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 500;
+}
+
+tr:nth-child(even) {
+    background-color: var(--light-gray);
+}
+
+tr:hover {
+    background-color: rgba(52, 152, 219, 0.05);
+}
+
+/* ======================
+   BADGES & STATUS INDICATORS
+   ====================== */
+.badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    color: white;
+    text-decoration: none;
+    transition: var(--transition);
+    text-transform: capitalize;
+}
+
+.badge:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+/* Status Badges */
+.badge.paid, 
+.badge.approved, 
+.badge.attended, 
+.badge.success {
+    background-color: var(--success-color);
+}
+
+.badge.partial, 
+.badge.warning {
+    background-color: var(--warning-color);
+}
+
+.badge.pending, 
+.badge.rejected, 
+.badge.cancelled, 
+.badge.danger {
+    background-color: var(--danger-color);
+}
+
+.badge.registered, 
+.badge.info {
+    background-color: var(--info-color);
+}
+
+.badge.inactive, 
+.badge.viewer, 
+.badge.neutral {
+    background-color: #7f8c8d;
+}
+
+/* ======================
+   CHARTS & DATA VISUALIZATION
+   ====================== */
+.bottom {
+    display: flex;
+    gap: 20px;
+}
+
+.chart-card {
+    flex: 1;
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.chart-card canvas {
+    width: 100% !important;
+    height: 200px !important;
+}
+
+/* ======================
+   FORM ELEMENTS
+   ====================== */
+.form-container {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: var(--card-shadow);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--dark-gray);
+    font-size: 14px;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.form-group input[type="text"],
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--medium-gray);
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.form-group input[type="text"]:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+textarea {
+    min-height: 200px;
+    resize: vertical;
+}
+
+* ======================
+   SEARCH & FILTER - Enhanced
+   ====================== */
+.search-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.search-form input[type="text"] {
+    flex: 1;
+    max-width: 400px;
+    padding: 10px 15px;
+    border: 1px solid var(--medium-gray);
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border 0.3s;
+}
+
+.search-form input[type="text"]:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.search-form button {
+    padding: 10px 20px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search-form button:hover {
+    background-color: var(--secondary-color);
+}
+
+/* ======================
+   BUTTONS & INTERACTIVE ELEMENTS
+   ====================== */
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: center;
+    border: none;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--secondary-color);
+}
+
+.btn-success {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.btn-danger {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--sidebar-bg);
+    color: white;
+    font-size: 16px;
+    margin-top: 10px;
+}
+
+.submit-btn:hover {
+    background-color: #1e272e;
+}
+
+.logout {
+    background: var(--danger-color);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 20px auto;
+    display: block;
+    width: calc(100% - 40px);
+}
+
+.btn-approve {
+    background-color: #28a745;
+    color: white;
+    padding: 4px 10px;
+    border: none;
+    border-radius: 4px;
+    margin-right: 5px;
+    cursor: pointer;
+}
+
+.btn-reject {
+    background-color: #dc3545;
+    color: white;
+    padding: 4px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* ======================
+   CHECKBOXES & TOGGLES
+   ====================== */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    margin: 15px 0;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+/* ======================
+   PAGINATION
+   ====================== */
+.pagination-container {
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.pagination {
+    display: flex;
+    gap: 5px;
+}
+
+.pagination-item {
+    padding: 8px 12px;
+    border-radius: 4px;
+    background-color: var(--light-gray);
+    color: var(--dark-gray);
+    text-decoration: none;
+    transition: var(--transition);
+    border: 1px solid var(--medium-gray);
+    min-width: 36px;
+    text-align: center;
+    font-size: 14px;
+}
+
+.pagination-item:hover {
+    background-color: #e9e9e9;
+    transform: translateY(-2px);
+}
+
+.pagination-item.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    font-weight: bold;
+}
+
+.pagination-ellipsis {
+    padding: 8px 12px;
+    color: #666;
+}
+
+.pagination-info {
+    color: #666;
+    font-size: 14px;
+}
+
+/* ======================
+   ALERTS & NOTIFICATIONS
+   ====================== */
+.alert {
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.error {
+    background-color: #ffebee;
+    color: #c62828;
+    border-left: 4px solid #c62828;
+}
+
+.success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border-left: 4px solid #2e7d32;
+}
+
+/* ======================
+   ANNOUNCEMENT SPECIFIC STYLES
+   ====================== */
+.announcement-history {
+    margin-top: 40px;
+    background: white;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.announcement-history h2 {
+    margin-top: 0;
+    color: #2f3640;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.announcement-card {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.announcement-card:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.announcement-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.announcement-header h3 {
+    margin: 0;
+    color: #2f3640;
+    font-size: 18px;
+}
+
+.announcement-date {
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+.announcement-body {
+    margin-bottom: 10px;
+    line-height: 1.6;
+    color: #34495e;
+}
+
+.announcement-footer {
+    font-size: 14px;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+.no-announcements {
+    text-align: center;
+    padding: 20px;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+/* ======================
+   RESPONSIVE ADJUSTMENTS
+   ====================== */
+@media (max-width: 1024px) {
+    .cards, .grid, .bottom {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        left: -250px;
+        transition: left 0.3s ease;
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+
+    .main {
+        margin-left: 0;
+        padding: 20px;
+    }
+
+    .hamburger {
+        display: block;
+        font-size: 28px;
+        cursor: pointer;
+        margin-left: auto;
+        margin-right: 10px;
+    }
+
+    .logout {
+        width: calc(100% - 40px);
+    }
+    
+    .form-container,
+    .announcement-history {
+        padding: 20px;
+    }
+    
+    .announcement-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .announcement-date {
+        margin-top: 5px;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+    }
+}
+
+/* ======================
+   PRINT STYLES
+   ====================== */
+@media print {
+    .sidebar, .logout, .hamburger { 
+        display: none; 
+    }
+    .main { 
+        width: 100%; 
+        margin: 0; 
+        padding: 10px;
+    }
+    .card, .table-card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+}
+
+/* Checkbox Styles */
+input[type="checkbox"] {
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+/* Forms */
+.form-container {
+  max-width:600px;
+  margin: 40px auto;
+  background:white;
+  padding:20px;
+  border-radius:8px;
+  box-shadow:0 2px 8px rgba(0,0,0,.1);
+}
+
+.form-container .logo {
+  display:block;
+  margin:0 auto 20px;
+  width:80px;
+}
+
+.form-group { margin-bottom:15px; }
+.form-group label {
+  display:block;
+  margin-bottom:5px;
+  font-weight:bold;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width:100%;
+  padding:8px;
+  border:1px solid #ccc;
+  border-radius:4px;
+}
+
+button {
+  background:#2f3640;
+  color:white;
+  padding:10px 20px;
+  border:none;
+  border-radius:4px;
+  cursor:pointer;
+}
+
+button:hover {
+  background:#414b57;
+}
+
+.message {
+  padding:10px;
+  margin-bottom:15px;
+  border-radius:4px;
+}
+
+.message.error   { 
+    background:#ffe6e6;
+    color:#a00; 
+}
+
+.message.success { 
+    background:#e6ffea; 
+    color:#080; 
+}
+
