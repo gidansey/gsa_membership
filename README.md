@@ -1,4 +1,6 @@
-# 🇬🇭 GSA Membership Management System
+![image](https://github.com/user-attachments/assets/dcf7acb2-09d8-4396-973f-fc05550631b7)
+
+# GSA Membership Management System
 
 **Empowering Science Through Organized Membership**
 
@@ -277,3 +279,13 @@ Built for the Ghana Science Association to streamline member services and coordi
 
 MIT License — see `LICENSE` for full details.
 **Proprietary to the Ghana Science Association (GSA)**. Do not distribute without permission.
+
+---
+
+## Screenshots
+![image](https://github.com/user-attachments/assets/dcf7acb2-09d8-4396-973f-fc05550631b7)
+![image](https://github.com/user-attachments/assets/67d16f23-3fee-483b-9565-e62da59b1460)
+![image](https://github.com/user-attachments/assets/0fd31b09-d3a6-41c1-9e53-2e9ca97f64e0)
+![image](https://github.com/user-attachments/assets/195faf93-04a6-4be5-9792-e93b31727795)
+
+---
