@@ -249,7 +249,9 @@ CREATE TABLE `members` (
   `status` enum('Pending','Approved','Rejected','Inactive') DEFAULT 'Pending',
   `branch_id` varchar(20) DEFAULT NULL,
   `letter_issued` tinyint(1) DEFAULT 0,
-  `notes` text DEFAULT NULL
+  `notes` text DEFAULT NULL,
+  `next_renewal_date` date DEFAULT NULL,
+  `membership_expiry_date` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
