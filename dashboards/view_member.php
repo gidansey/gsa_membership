@@ -1,116 +1,116 @@
 <?php
-session_start();
-require_once '../includes/db_connect.php';
+    session_start();
+    require_once '../includes/db_connect.php';
 
-// Session timeout
-$timeout_duration = 1800;
-if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY']) > $timeout_duration) {
-    header("Location: ../includes/timeout.php");
-    exit;
-}
-$_SESSION['LAST_ACTIVITY'] = time();
+    // Session timeout
+    $timeout_duration = 1800;
+    if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY']) > $timeout_duration) {
+        header("Location: ../includes/timeout.php");
+        exit;
+    }
+    $_SESSION['LAST_ACTIVITY'] = time();
 
-// Access control
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'Branch Leader') {
-    header("Location: ../index.php");
-    exit;
-}
+    // Access control
+    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'Branch Leader') {
+        header("Location: ../index.php");
+        exit;
+    }
 
-// Get member ID
-$member_id = intval($_GET['id'] ?? 0);
-if (!$member_id) {
-    die("Invalid member ID.");
-}
+    // Get member ID
+    $member_id = intval($_GET['id'] ?? 0);
+    if (!$member_id) {
+        die("Invalid member ID.");
+    }
 
-$branch_id = $_SESSION['branch_id'];
+    $branch_id = $_SESSION['branch_id'];
 
-// Main member info + institution from affiliation + membership type from member_category
-$sql = "
-  SELECT
-    m.*,
-    a.branch_id,
-    a.institution_name   AS institution,
-    mc.membership_type_id,
-    mt.type_name         AS membership_type
-  FROM members m
-  JOIN affiliations a 
-    ON m.id = a.member_id
-  LEFT JOIN member_category mc 
-    ON m.id = mc.member_id
-  LEFT JOIN membership_types mt 
-    ON mc.membership_type_id = mt.id
-  WHERE m.id = ? 
-    AND a.branch_id = ?
-";
-$stmt = $conn->prepare($sql);
-if (!$stmt) {
-    die("Prepare failed: " . $conn->error);
-}
-$stmt->bind_param("ii", $member_id, $branch_id);
-$stmt->execute();
-$member = $stmt->get_result()->fetch_assoc();
-$stmt->close();
+    // Main member info + institution from affiliation + membership type from member_category
+    $sql = "
+      SELECT
+        m.*,
+        a.branch_id,
+        a.institution_name   AS institution,
+        mc.membership_type_id,
+        mt.type_name         AS membership_type
+      FROM members m
+      JOIN affiliations a 
+        ON m.id = a.member_id
+      LEFT JOIN member_category mc 
+        ON m.id = mc.member_id
+      LEFT JOIN membership_types mt 
+        ON mc.membership_type_id = mt.id
+      WHERE m.id = ? 
+        AND a.branch_id = ?
+    ";
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        die("Prepare failed: " . $conn->error);
+    }
+    $stmt->bind_param("ii", $member_id, $branch_id);
+    $stmt->execute();
+    $member = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
 
-if (!$member) {
-    die("Member not found or not in your branch.");
-}
+    if (!$member) {
+        die("Member not found or not in your branch.");
+    }
 
-// Academic background
-$academic_stmt = $conn->prepare("SELECT * FROM academic_background WHERE member_id = ?");
-if (!$academic_stmt) {
-    die("Prepare failed: (" . $conn->errno . ") " . $conn->error);
-}
-$academic_stmt->bind_param("i", $member_id);
-$academic_stmt->execute();
-$academic_result = $academic_stmt->get_result();
-$academics = $academic_result->fetch_all(MYSQLI_ASSOC);
-$academic_stmt->close();
+    // Academic background
+    $academic_stmt = $conn->prepare("SELECT * FROM academic_background WHERE member_id = ?");
+    if (!$academic_stmt) {
+        die("Prepare failed: (" . $conn->errno . ") " . $conn->error);
+    }
+    $academic_stmt->bind_param("i", $member_id);
+    $academic_stmt->execute();
+    $academic_result = $academic_stmt->get_result();
+    $academics = $academic_result->fetch_all(MYSQLI_ASSOC);
+    $academic_stmt->close();
 
-// Last paid dues and next renewal
-$dues_stmt = $conn->prepare("SELECT amount_paid, payment_date FROM payments WHERE member_id = ? ORDER BY payment_date DESC LIMIT 1");
-if (!$dues_stmt) {
-    die("Prepare failed: (" . $conn->errno . ") " . $conn->error);
-}
-$dues_stmt->bind_param("i", $member_id);
-$dues_stmt->execute();
-$dues_result = $dues_stmt->get_result();
-$dues = $dues_result->fetch_assoc();
-$dues_stmt->close();
+    // Last paid dues and next renewal
+    $dues_stmt = $conn->prepare("SELECT amount_paid, payment_date FROM payments WHERE member_id = ? ORDER BY payment_date DESC LIMIT 1");
+    if (!$dues_stmt) {
+        die("Prepare failed: (" . $conn->errno . ") " . $conn->error);
+    }
+    $dues_stmt->bind_param("i", $member_id);
+    $dues_stmt->execute();
+    $dues_result = $dues_stmt->get_result();
+    $dues = $dues_result->fetch_assoc();
+    $dues_stmt->close();
 
-// Branch events
-$branch_events_stmt = $conn->prepare("
-    SELECT e.name AS title, ep.participation_date AS date_participated 
-    FROM event_participation ep
-    JOIN events e ON ep.event_id = e.id
-    JOIN branches b ON e.location LIKE CONCAT('%', b.branch_name, '%') AND b.id = ?
-    WHERE ep.member_id = ?
-");
-if (!$branch_events_stmt) {
-    die("Prepare failed: (" . $conn->errno . ") " . $conn->error);
-}
-$branch_events_stmt->bind_param("ii", $branch_id, $member_id);
-$branch_events_stmt->execute();
-$branch_events = $branch_events_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-$branch_events_stmt->close();
+    // Branch events
+    $branch_events_stmt = $conn->prepare("
+        SELECT e.name AS title, ep.participation_date AS date_participated 
+        FROM event_participation ep
+        JOIN events e ON ep.event_id = e.id
+        JOIN branches b ON e.location LIKE CONCAT('%', b.branch_name, '%') AND b.id = ?
+        WHERE ep.member_id = ?
+    ");
+    if (!$branch_events_stmt) {
+        die("Prepare failed: (" . $conn->errno . ") " . $conn->error);
+    }
+    $branch_events_stmt->bind_param("ii", $branch_id, $member_id);
+    $branch_events_stmt->execute();
+    $branch_events = $branch_events_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $branch_events_stmt->close();
 
-// National events
-$national_events_stmt = $conn->prepare("
-    SELECT e.name AS title, ep.participation_date AS date_participated
-    FROM event_participation ep
-    JOIN events e ON ep.event_id = e.id
-    WHERE ep.member_id = ? AND e.location LIKE '%National%'
-");
-if (!$national_events_stmt) {
-    die("Prepare failed: (" . $conn->errno . ") " . $conn->error);
-}
-$national_events_stmt->bind_param("i", $member_id);
-$national_events_stmt->execute();
-$national_events = $national_events_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-$national_events_stmt->close();
+    // National events
+    $national_events_stmt = $conn->prepare("
+        SELECT e.name AS title, ep.participation_date AS date_participated
+        FROM event_participation ep
+        JOIN events e ON ep.event_id = e.id
+        WHERE ep.member_id = ? AND e.location LIKE '%National%'
+    ");
+    if (!$national_events_stmt) {
+        die("Prepare failed: (" . $conn->errno . ") " . $conn->error);
+    }
+    $national_events_stmt->bind_param("i", $member_id);
+    $national_events_stmt->execute();
+    $national_events = $national_events_stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $national_events_stmt->close();
 
-// Page display
-$isDashboard = true;
-include '../includes/header.php';
+    // Page display
+    $isDashboard = true;
+    include '../includes/header.php';
 ?>
 
 <div class="dashboard">
@@ -135,7 +135,7 @@ include '../includes/header.php';
         </header>
 
         <div class="card" style="padding: 20px;">
-            <h2><?= htmlspecialchars($member['first_name'] . ' ' . $member['last_name']) ?></h2>
+            <h2><?= htmlspecialchars($member['first_name'] . ' ' . $member['other_names']. ' ' . $member['last_name']) ?></h2>
             <p><strong>Member ID:</strong> <?= htmlspecialchars($member['member_id']) ?></p>
             <p><strong>Email:</strong> <?= htmlspecialchars($member['email']) ?></p>
             <p><strong>Phone:</strong> <?= htmlspecialchars($member['phone'] ?? 'N/A') ?></p>

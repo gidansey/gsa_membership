@@ -36,6 +36,36 @@ if (!$branch_id) {
     exit;
 }
 
+// Notification System
+$unread_count = 0;
+$user_id = $_SESSION['user_id'];
+
+// Get unread notifications count
+$stmt = $conn->prepare("SELECT COUNT(*) AS count FROM notifications WHERE user_id = ? AND is_read = 0");
+if ($stmt) {
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($row = $result->fetch_assoc()) {
+        $unread_count = $row['count'];
+    }
+    $stmt->close();
+}
+
+// Get latest notifications
+$notif_sql = "SELECT message, link, created_at, is_read 
+              FROM notifications 
+              WHERE user_id = ? 
+              ORDER BY created_at DESC 
+              LIMIT 5";
+
+$stmt = $conn->prepare($notif_sql);
+if ($stmt) {
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $notifications = $stmt->get_result();
+}
+
 $selected_year = $_GET['year'] ?? date('Y');
 $year_filter = "AND YEAR(payment_date) = " . intval($selected_year);
 
@@ -204,9 +234,47 @@ $isDashboard = true;
 
     <main class="main">
         <header>
-            <div class="hamburger" onclick="toggleSidebar()">☰</div>
-            <h1>Branch Leader Dashboard</h1>
-            <p>Welcome, <?= $full_name ?></p>
+            <div class="header-content">
+                <div>
+                    <div class="hamburger" onclick="toggleSidebar()">☰</div>
+                    <h1>Branch Leader Dashboard</h1>
+                </div>
+                <div class="welcome-section">
+                    <p>Welcome, <?= $full_name ?></p>
+                    <div class="notification-container" style="position: relative;">
+                        <a href="notifications.php" class="notification-badge">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                            <?php if ($unread_count > 0): ?>
+                                <span class="badge-count"><?= $unread_count ?></span>
+                            <?php endif; ?>
+                        </a>
+                        <div class="notification-dropdown">
+                            <h3 style="padding: 15px; margin: 0; border-bottom: 1px solid #eee;">Notifications</h3>
+                            <?php if ($notifications && $notifications->num_rows > 0): ?>
+                                <?php while ($notif = $notifications->fetch_assoc()): ?>
+                                    <div class="notification-item <?= $notif['is_read'] ? '' : 'unread' ?>">
+                                        <div><?= htmlspecialchars($notif['message']) ?></div>
+                                        <div class="notification-time">
+                                            <?= date('M d, Y h:i A', strtotime($notif['created_at'])) ?>
+                                            <?php if (!$notif['is_read']): ?>
+                                                <span style="color: #3498db; margin-left: 10px;">• New</span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                <?php endwhile; ?>
+                            <?php else: ?>
+                                <div class="notification-item">
+                                    <div>No notifications</div>
+                                </div>
+                            <?php endif; ?>
+                            <a href="notifications.php" class="view-all">View All Notifications</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </header>
 
         <form method="GET" style="margin-bottom: 20px;">
@@ -262,5 +330,30 @@ $isDashboard = true;
         <button onclick="window.print()" class="btn">🖨️ Print Report</button>
     </main>
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    
+    // Mark notifications as read when clicked
+    document.querySelectorAll('.notification-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const notificationId = this.dataset.id;
+            if (notificationId) {
+                fetch('mark_notification_read.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `id=${notificationId}`
+                });
+            }
+        });
+    });
+});
+
+function toggleSidebar() {
+    document.querySelector('.sidebar').classList.toggle('active');
+}
+</script>
 
 <?php include '../includes/footer.php'; ?>

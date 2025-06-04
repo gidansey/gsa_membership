@@ -52,6 +52,7 @@
         <div class="logo"></div>
         <nav>
             <a href="secretariat_dashboard.php">Dashboard</a>
+            <a href="manage_payments.php">Manage Payments</a>
             <a href="approve_members.php" class="active">Approve Members</a>
             <a href="verify_payments.php">Verify Payments</a>
             <a href="issue_letters.php">Membership Letters</a>

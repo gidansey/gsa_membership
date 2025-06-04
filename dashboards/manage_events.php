@@ -1,38 +1,36 @@
 <?php
-    $timeout_duration = 1800; // 30 minutes
+session_start();
+require_once '../includes/db_connect.php';
 
-    if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY']) > $timeout_duration) {
-        header("Location: ../includes/timeout.php");
-        exit;
-    }
-    $_SESSION['LAST_ACTIVITY'] = time();
+$timeout_duration = 1800;
+if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY']) > $timeout_duration) {
+    header("Location: ../timeout.php");
+    exit;
+}
+$_SESSION['LAST_ACTIVITY'] = time();
 
-    session_start();
-    require_once '../includes/db_connect.php';
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'Admin') {
+    header("Location: ../index.php");
+    exit;
+}
 
-    if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'Admin') {
-        header("Location: ../index.php");
-        exit;
-    }
+$isDashboard = true;
+$success = isset($_GET['success']) && $_GET['success'] == 1;
+$filter = $_GET['filter'] ?? 'all';
+$where = match($filter) {
+    'upcoming' => "WHERE event_date > NOW()",
+    'past' => "WHERE event_date < NOW()",
+    default => ''
+};
 
-    $isDashboard = true;
+$events = [];
+$sql = "SELECT * FROM events $where ORDER BY event_date DESC";
+$result = $conn->query($sql);
+if ($result) {
+    $events = $result->fetch_all(MYSQLI_ASSOC);
+}
 
-    // Fetch events
-    $filter = $_GET['filter'] ?? 'all';
-    $where = match($filter) {
-        'upcoming' => "WHERE event_date > NOW()",
-        'past' => "WHERE event_date < NOW()",
-        default => ''
-    };
-
-    $events = [];
-    $sql = "SELECT * FROM events $where ORDER BY event_date DESC";
-    $result = $conn->query($sql);
-    if ($result) {
-        $events = $result->fetch_all(MYSQLI_ASSOC);
-    }
-
-    include '../includes/header.php';
+include '../includes/header.php';
 ?>
 
 <div class="dashboard">
@@ -60,7 +58,19 @@
             <h1>Manage Events</h1>
         </header>
 
-        <form method="GET" style="margin-bottom: 15px;">
+        <?php if ($success): ?>
+            <div class="alert success">✅ Event added successfully.</div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['updated']) && $_GET['updated'] == 1): ?>
+            <div class="alert info">✏️ Event updated successfully.</div>
+        <?php endif; ?>
+
+        <?php if (isset($_GET['notified']) && $_GET['notified'] == 1): ?>
+            <div class="alert success">📧 Event was sent to all members and branch leaders.</div>
+        <?php endif; ?>
+
+        <form method="GET" class="search-form">
             <label>Filter:</label>
             <select name="filter" onchange="this.form.submit()">
                 <option value="all" <?= $filter === 'all' ? 'selected' : '' ?>>All</option>
@@ -76,30 +86,71 @@
         <div class="table-card">
             <h3><?= ucfirst($filter) ?> Events</h3>
             <table>
-                <tr>
-                    <th>Name</th>
-                    <th>Date</th>
-                    <th>Location</th>
-                    <th>Actions</th>
-                </tr>
-                <?php if ($events): ?>
-                    <?php foreach ($events as $event): ?>
-                        <tr>
-                            <td><?= htmlspecialchars($event['name']) ?></td>
-                            <td><?= date('M d, Y - h:i A', strtotime($event['event_date'])) ?></td>
-                            <td><?= htmlspecialchars($event['location']) ?></td>
-                            <td>
-                                <a href="edit_event.php?id=<?= $event['id'] ?>" class="badge partial">Edit</a>
-                                <a href="delete_event.php?id=<?= $event['id'] ?>" onclick="return confirm('Delete this event?')" class="badge pending">Delete</a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <tr><td colspan="4">No events found.</td></tr>
-                <?php endif; ?>
+                <thead>
+                    <tr>
+                        <th>Image</th>
+                        <th>Name</th>
+                        <th>Date</th>
+                        <th>Location</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if ($events): ?>
+                        <?php foreach ($events as $event): ?>
+                            <tr>
+                                <td>
+                                    <?php if (!empty($event['image_path'])): ?>
+                                        <div class="thumbnail" onclick="openModal('../uploads/events/<?= htmlspecialchars($event['image_path']) ?>')">
+                                            <img src="../uploads/events/<?= htmlspecialchars($event['image_path']) ?>" alt="<?= htmlspecialchars($event['name']) ?>">
+                                        </div>
+                                    <?php else: ?>
+                                        <div class="no-thumbnail">No Image</div>
+                                    <?php endif; ?>
+                                </td>
+                                <td><?= htmlspecialchars($event['name']) ?></td>
+                                <td><?= date('M d, Y - h:i A', strtotime($event['event_date'])) ?></td>
+                                <td><?= htmlspecialchars($event['location']) ?></td>
+                                <td>
+                                    <a href="view_event.php?id=<?= $event['id'] ?>" class="badge info">View</a>
+                                    <form method="POST" action="send_event_notification.php" style="display:inline;">
+                                        <input type="hidden" name="event_id" value="<?= $event['id'] ?>">
+                                        <?php if (!empty($event['attachment_path'])): ?>
+                                            <label style="font-size: 12px;">
+                                                <input type="checkbox" name="include_attachment" checked> Include Attachment
+                                            </label>
+                                        <?php endif; ?>
+                                        <button type="submit" class="badge success" onclick="return confirm('Send this event to all members and branch leaders?')">Send</button>
+                                    </form>
+                                    <a href="view_event_notifications.php?id=<?= $event['id'] ?>" class="badge viewer">Recipients</a>
+                                    <a href="edit_event.php?id=<?= $event['id'] ?>" class="badge partial">Edit</a>
+                                    <a href="delete_event.php?id=<?= $event['id'] ?>" onclick="return confirm('Delete this event?')" class="badge pending">Delete</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <tr><td colspan="5">No events found.</td></tr>
+                    <?php endif; ?>
+                </tbody>
             </table>
         </div>
     </main>
 </div>
+
+<!-- Modal for full image preview -->
+<div id="imageModal" style="display:none; position:fixed; z-index:9999; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.75); justify-content:center; align-items:center;">
+    <img id="modalImage" src="" style="max-width:90%; max-height:90%; border:5px solid white; border-radius:8px;">
+    <span onclick="closeModal()" style="position:absolute; top:20px; right:30px; font-size:36px; color:white; cursor:pointer;">&times;</span>
+</div>
+
+<script>
+function openModal(src) {
+    document.getElementById('modalImage').src = src;
+    document.getElementById('imageModal').style.display = 'flex';
+}
+function closeModal() {
+    document.getElementById('imageModal').style.display = 'none';
+}
+</script>
 
 <?php include '../includes/footer.php'; ?>

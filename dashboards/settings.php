@@ -78,7 +78,7 @@
             <h3>Membership Dues Configuration</h3>
             <form method="POST" action="update_dues.php">
                 <?php foreach ($membership_types as $type): ?>
-                    <label><?= htmlspecialchars($type['type_name']) ?> (GHS)</label>
+                    <label><?= htmlspecialchars($type['type_name']) ?></label>
                     <input type="number" step="0.01" name="dues[<?= $type['id'] ?>]"
                            value="<?= htmlspecialchars($type['annual_dues']) ?>"
                            style="padding:10px;width:100%;margin-bottom:15px;border-radius:6px;border:1px solid #ccc">
