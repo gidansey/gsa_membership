@@ -484,6 +484,15 @@ CREATE TABLE `settings` (
   `setting_value` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `settings`
+--
+
+INSERT INTO `settings` (`id`, `setting_key`, `setting_value`) VALUES
+(1, 'org_name', 'Ghana Science Association'),
+(2, 'slogan', 'To become a dominant voice in Science and Technology advocacy by promoting and popularizing Science and Technology to meet national developmental needs'),
+(3, 'contact_email', 'info@ghanascience.gov.gh');
+
 -- --------------------------------------------------------
 
 --
@@ -506,17 +515,18 @@ CREATE TABLE `users` (
   `locked_until` datetime DEFAULT NULL,
   `member_id` int(11) DEFAULT NULL,
   `remember_token` varchar(255) DEFAULT NULL,
-  `last_login` datetime DEFAULT NULL
+  `last_login` datetime DEFAULT NULL,
+  `profile_picture` varchar(255) DEFAULT 'default_profile.jpg'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `username`, `password`, `first_name`, `last_name`, `email`, `phone`, `role`, `status`, `created_at`, `updated_at`, `failed_attempts`, `locked_until`, `member_id`, `remember_token`, `last_login`) VALUES
-(1, 'daniel.gidi', '$2y$10$al5Gxci5fJjbMl5TiL7l3e1QwxT5AGvkFy309KXvNHGMIVxrGuKwS', 'Daniel Kojo', 'Gidi', 'daniel.gidi@ghanascience.gov.gh', '0246515081', 'Admin', 'Active', '2025-04-29 10:21:43', '2025-05-26 09:28:43', 0, NULL, NULL, NULL, '2025-05-12 12:15:21'),
-(2, 'dangidi', '$2y$10$Ds9giXCuzu3xk2P93ahHDOh3R1bVcBfFLH1/xhcu4ZQUb8BogEC4u', 'Dan', 'Gidi', 'gidansey@gmail.com', NULL, 'Secretariat', 'Active', '2025-05-02 16:23:13', '2025-05-12 12:15:07', 0, NULL, NULL, NULL, '2025-05-12 12:15:07'),
-(3, 'dandee', '$2y$10$Ew8FZZiVt2ROMZSWJa2lZuPsde2lMobtCbuhJ/RjHwTEuj/Hf2dVe', 'Dan', 'Dee', 'dankgidi@gmail.com', '', 'Branch Leader', 'Active', '2025-05-07 15:41:33', '2025-05-13 11:47:25', 0, NULL, 1, NULL, '2025-05-12 12:15:01');
+INSERT INTO `users` (`id`, `username`, `password`, `first_name`, `last_name`, `email`, `phone`, `role`, `status`, `created_at`, `updated_at`, `failed_attempts`, `locked_until`, `member_id`, `remember_token`, `last_login`, `profile_picture`) VALUES
+(1, 'daniel.gidi', '$2y$10$al5Gxci5fJjbMl5TiL7l3e1QwxT5AGvkFy309KXvNHGMIVxrGuKwS', 'Daniel Kojo', 'Gidi', 'daniel.gidi@ghanascience.gov.gh', '0246515081', 'Admin', 'Active', '2025-04-29 10:21:43', '2025-05-26 09:28:43', 0, NULL, NULL, NULL, '2025-05-12 12:15:21', 'default_profile.jpg'),
+(2, 'dangidi', '$2y$10$Ds9giXCuzu3xk2P93ahHDOh3R1bVcBfFLH1/xhcu4ZQUb8BogEC4u', 'Dan', 'Gidi', 'gidansey@gmail.com', '0506181899', 'Secretariat', 'Active', '2025-05-02 16:23:13', '2025-06-11 15:45:23', 0, NULL, NULL, NULL, '2025-05-12 12:15:07', 'default_profile.jpg'),
+(3, 'dandee', '$2y$10$Ew8FZZiVt2ROMZSWJa2lZuPsde2lMobtCbuhJ/RjHwTEuj/Hf2dVe', 'Dan', 'Dee', 'dankgidi@gmail.com', '0246515081', 'Branch Leader', 'Active', '2025-05-07 15:41:33', '2025-06-11 15:48:28', 0, NULL, 1, NULL, '2025-05-12 12:15:01', 'user_3_1749656908.jpg');
 
 -- --------------------------------------------------------
 
@@ -897,7 +907,7 @@ ALTER TABLE `roles`
 -- AUTO_INCREMENT for table `settings`
 --
 ALTER TABLE `settings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
